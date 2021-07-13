@@ -69,7 +69,7 @@ export class EmployeeService {
       if (department) {
         updateEm.department = department;
       }
-      
+
       updateEm.save();
     } catch (error) {
       console.log(error);
@@ -132,11 +132,14 @@ export class EmployeeService {
   }
 
   //Get Em by DepartmentID
-  async getEmployeeByDeparmentId(departmentId: string) {
-    const employees = await this.employeesModel.find().exec();
-    return employees.filter((employee) => {
-      return employee.department === departmentId;
+  async getEmployeeByDeparmentId(departmentId: any): Promise<any> {
+    console.log(departmentId.id);
+    const employees = await this.employeesModel.find({
+      department: departmentId.id,
     });
+    //  employees.filter((employee) => return employee.department == departmentId.id;
+    // const department = this.departmentModel.find({ _id: departmentId.id });
+    return employees;
   }
   //Find by Emloyee by ID
   async findEmId(id: string): Promise<Employee> {

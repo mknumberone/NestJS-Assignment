@@ -1,13 +1,13 @@
 import { Delete, Get } from '@nestjs/common';
 import { Put } from '@nestjs/common';
 import { Body, Controller, Param, Post } from '@nestjs/common';
-import { EmployeeService } from 'src/employee/employee.service';
+import { EmployeeService } from '../employee/employee.service';
 import { DepartmentService } from './department.service';
 
 @Controller('department')
 export class DepartmentController {
   constructor(
-    // private readonly employeeService: EmployeeService,
+    private readonly employeeService: EmployeeService,
     private readonly departmentService: DepartmentService,
   ) {}
 
@@ -27,7 +27,10 @@ export class DepartmentController {
     );
     return result;
   }
-
+  @Get(':id/employee')
+  getEmployee(@Param() param) {
+    return this.employeeService.getEmployeeByDeparmentId(param);
+  }
   // Get List Department
   @Get()
   async getAllDeparment() {
@@ -61,5 +64,4 @@ export class DepartmentController {
     await this.departmentService.deleteDepartmentInfor(departmentId);
     return null;
   }
-
 }

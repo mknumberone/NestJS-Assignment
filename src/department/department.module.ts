@@ -7,7 +7,6 @@ import { DepartmentSchema } from './department.model';
 import { DepartmentService } from './department.service';
 import { EmpDepartmentController } from './employee.controller';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([

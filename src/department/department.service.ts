@@ -24,8 +24,8 @@ export class DepartmentService {
         officephone,
         manager,
       });
-      if(id ===newDepartment.id){
-        return "Phòng này đã tồn tại!"
+      if (id === newDepartment.id) {
+        return 'Phòng này đã tồn tại!';
       }
       //Save to database
       const result = await newDepartment.save();
@@ -76,35 +76,35 @@ export class DepartmentService {
     officephone: number,
     manager: string,
   ) {
-      try {
-          const updateD = await this.findDepartment(id)
-          if(namedepartment){
-              updateD.namedepartment = namedepartment;
-          }
-          if(officephone){
-              updateD.officephone= officephone;
-          }
-          if(manager){
-              updateD.manager = manager;
-          }
-          updateD.save();
-      } catch (error) {
-         console.log(error);
-         throw new NotFoundException('Update Failed!'); 
+    try {
+      const updateD = await this.findDepartment(id);
+      if (namedepartment) {
+        updateD.namedepartment = namedepartment;
       }
+      if (officephone) {
+        updateD.officephone = officephone;
+      }
+      if (manager) {
+        updateD.manager = manager;
+      }
+      updateD.save();
+    } catch (error) {
+      console.log(error);
+      throw new NotFoundException('Update Failed!');
+    }
   }
   // DeleteOne Department
-  async deleteDepartmentInfor(departmentId:string){
-      try {
-          const result = await this.departmentModel.deleteOne({ _id:departmentId}).exec()
-        if (result.n === 0) {
-          throw new NotFoundException('Could not find Department');
-        }
-        } catch (error) {
-          
+  async deleteDepartmentInfor(departmentId: string) {
+    try {
+      const result = await this.departmentModel
+        .deleteOne({ _id: departmentId })
+        .exec();
+      if (result.n === 0) {
+        throw new NotFoundException('Could not find Department');
       }
+    } catch (error) {}
   }
-  
+
   // find Department by id
   async findDepartment(id: string): Promise<Department> {
     let department;
