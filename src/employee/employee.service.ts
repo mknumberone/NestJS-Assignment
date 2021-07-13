@@ -20,6 +20,7 @@ export class EmployeeService {
     department: string,
   ) {
     try {
+      let file = '';
       const newEmployee = new this.employeesModel({
         employeename,
         photo,
@@ -28,12 +29,51 @@ export class EmployeeService {
         email,
         department,
       });
+      newEmployee.photo = file;
       // Save to database
       const result = await newEmployee.save();
       return result.name;
     } catch (error) {
       console.log(error);
       throw new NotFoundException('Insert Failed!');
+    }
+  }
+  // Update Employee Infor
+  async updateEmployeeInfor(
+    employeeId: string,
+    employeename: string,
+    photo: string,
+    jobtitle: string,
+    cellphone: number,
+    email: string,
+    department: string,
+  ) {
+    try {
+      let file = '';
+      const updateEm = await this.findEmId(employeeId);
+      if (employeename) {
+        updateEm.name = employeename;
+      }
+      if (photo) {
+        updateEm.photo = photo = file;
+      }
+      if (jobtitle) {
+        updateEm.jobtitle = jobtitle;
+      }
+      if (cellphone) {
+        updateEm.cellphone = cellphone;
+      }
+      if (email) {
+        updateEm.email = email;
+      }
+      if (department) {
+        updateEm.department = department;
+      }
+      
+      updateEm.save();
+    } catch (error) {
+      console.log(error);
+      throw new NotFoundException('Update false');
     }
   }
   // Get all list employee
@@ -76,42 +116,6 @@ export class EmployeeService {
       throw new NotFoundException('Get Failed!');
     }
   }
-  // Update Employee Infor
-  async updateEmployeeInfor(
-    employeeId: string,
-    employeename: string,
-    photo: string,
-    jobtitle: string,
-    cellphone: number,
-    email: string,
-    department: string,
-  ) {
-    try {
-      const updateEm = await this.findEmId(employeeId);
-      if (employeename) {
-        updateEm.name = employeename;
-      }
-      if (photo) {
-        updateEm.photo = photo;
-      }
-      if (jobtitle) {
-        updateEm.jobtitle = jobtitle;
-      }
-      if (cellphone) {
-        updateEm.cellphone = cellphone;
-      }
-      if (email) {
-        updateEm.email = email;
-      }
-      if (department) {
-        updateEm.department = department;
-      }
-      updateEm.save();
-    } catch (error) {
-      console.log(error);
-      throw new NotFoundException('Update false');
-    }
-  }
   // Delete Employee Infor
   async deleteEmloyeeInfor(employeeId: string) {
     try {
@@ -127,6 +131,13 @@ export class EmployeeService {
     }
   }
 
+  //Get Em by DepartmentID
+  async getEmployeeByDeparmentId(departmentId: string) {
+    const employees = await this.employeesModel.find().exec();
+    return employees.filter((employee) => {
+      return employee.department === departmentId;
+    });
+  }
   //Find by Emloyee by ID
   async findEmId(id: string): Promise<Employee> {
     let employee;

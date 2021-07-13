@@ -1,5 +1,3 @@
-import { DepartmentService } from './department/department.service';
-import { AdministratorService } from './administrator/administrator.service';
 import { Module } from '@nestjs/common';
 // Database
 import {MongooseModule} from '@nestjs/mongoose'
@@ -8,6 +6,7 @@ import { DepartmentModule } from './department/department.module';
 import { EmployeeModule } from './employee/employee.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
+import { MulterModule } from '@nestjs/platform-express';
 
 
 @Module({
@@ -15,12 +14,14 @@ import { AppController } from './app.controller';
     MongooseModule.forRoot(
       'mongodb+srv://xuanthai123:xuanthai123@cluster0.icygv.mongodb.net/assignment?retryWrites=true&w=majority',
     ),
+    DepartmentModule,
     EmployeeModule,
     AdministratorModule,
-    DepartmentModule,
     AuthModule,
+    MulterModule.register({
+      dest: './files',
+    }),
   ],
   controllers: [AppController],
-  providers: [],
 })
 export class AppModule {}
