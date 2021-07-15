@@ -1,11 +1,18 @@
 import { EmployeeService } from './employee.service';
-import { Controller, Delete, Param, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Body } from '@nestjs/common';
 import { Get } from '@nestjs/common';
 import { Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../ultis/file-uploading.utils';
-
 
 @Controller('employee')
 export class EmployeeController {
@@ -16,16 +23,16 @@ export class EmployeeController {
   @UseInterceptors(FileInterceptor('photo', multerOptions))
   async uploadedEmployee(
     @Body('name') employeename: string,
-    @Body('photo') photo: string,
+    @UploadedFile() file: Express.Multer.File,
+    // @Body('photo') photo: string,
     @Body('jobtitle') jobtitle: string,
     @Body('cellphone') cellphone: number,
     @Body('email') email: string,
     @Body('department') department: string,
-    @UploadedFile() file: Express.Multer.File,
   ) {
     const result = await this.employeesService.createEmployee(
       employeename,
-      photo=file.path,
+      file.path,
       jobtitle,
       cellphone,
       email,
@@ -49,7 +56,7 @@ export class EmployeeController {
     const result = await this.employeesService.updateEmployeeInfor(
       empId,
       employeename,
-      photo=file.path,
+      (photo = file.path),
       jobtitle,
       cellphone,
       email,

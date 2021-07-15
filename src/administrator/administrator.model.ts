@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose'
+import { UpdateAdminRespone } from './dto/administrator.dto'
 
 export const AdministratorSchema = new mongoose.Schema({
     username:{type: String, require: true},
@@ -9,6 +10,7 @@ export const AdministratorSchema = new mongoose.Schema({
 })
 
 export interface Administrator {
+    updateOne(updateAdmin: UpdateAdminRespone): import("./dto/administrator.dto").AdminResponeDto | PromiseLike<import("./dto/administrator.dto").AdminResponeDto>
     length: number;
     save()
     id: string;

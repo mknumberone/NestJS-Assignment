@@ -6,6 +6,8 @@ import { sendMail } from '../ultis/mailer';
 const bcrypt = require('bcrypt');
 
 import { v4 as uuidv4 } from 'uuid';
+import { CreateAdminDto, FindAdminsResponesDto } from './dto/administrator.dto';
+
 @Injectable()
 export class AdministratorService {
   constructor(
@@ -14,6 +16,7 @@ export class AdministratorService {
   ) {}
   // insert a account to database
   async insertAccount(
+    payload:CreateAdminDto,
     username: string,
     //password: string,
     email: string,
@@ -59,37 +62,19 @@ export class AdministratorService {
     }
   }
   //Get all list admin
-  async getAdministrators() {
-    const administrators = await this.administratorModel.find().exec();
+  async getAdministrators(): Promise<FindAdminsResponesDto[]> {
     try {
-      return administrators.map((admin) => ({
-        id: admin.id,
-        username: admin.username,
-        password: admin.password,
-        email: admin.email,
-        role: admin.role,
-        state: admin.state,
-      }));
+      const administrators = await this.administratorModel.find();
+      return administrators
     } catch (error) {
       throw new NotFoundException('Get Failed!');
     }
   }
   // Get admin by Id
-  async getSingleAdministrator(adminId: string) {
-    const admin = await this.findAdmin(adminId);
+  async getSingleAdministrator(adminId: string):Promise<FindAdminsResponesDto>{
     try {
-      if (!admin) {
-        return 'User does not exits';
-      } else {
-        return {
-          id: admin.id,
-          username: admin.username,
-          password: admin.password,
-          email: admin.email,
-          role: admin.role,
-          state: admin.state,
-        };
-      }
+      const admin = await this.findAdmin(adminId);
+      return admin
     } catch (error) {
       throw new NotFoundException('Delete Failed!');
     }
@@ -174,29 +159,6 @@ export class AdministratorService {
             return 'Đổi mật khẩu thành công';
           }
       }
-      // if (!userRow) {
-      //   return 'Người dùng đéo tồn tại';
-      // }
-      // if (userRow) {
-      //   if(!match){
-      //     return "Mật khẩu cũ chưa đúng"
-      //   }
-      //   if(!checkNewAndOldPass){
-      //     return "Mật khẩu cũ giống mật khẩu mới"
-      //   }
-      //   if(!checkPass){
-      //     return "Mật khẩu xác nhận chưa trùng khớp!"
-      //   }
-      //   if(user && match && checkPass){
-      //     const saltOrRounds = 10;
-      //     newPass = await bcrypt.hash(newPass, saltOrRounds);
-      //     userRow.password=newPass;
-      //     const updatPassAdministrator = new this.administratorModel(userRow);
-      //     // Save admin in DB
-      //     const result = await updatPassAdministrator.save();
-      //     return "Đổi mật khẩu thành công";
-      //   }
-      // }
     } catch (error) {
       throw new NotFoundException('Could not find administrator.');
     }

@@ -12,14 +12,17 @@ import {
 import {AdministratorService} from './administrator.service'
 import { AuthGuard } from '@nestjs/passport';
 import { Put } from '@nestjs/common';
+import { FindAdminsResponesDto } from './dto/administrator.dto';
+import { AuthService } from 'src/auth/auth.service';
 @Controller('administrators')
 export class AdministratorController {
-  constructor(private readonly administratorService: AdministratorService) {}
+  constructor(private readonly administratorService: AdministratorService,
+              private readonly authService:AuthService) {}
   // Login
   @UseGuards(AuthGuard('local'))
   @Post('auth/login')
   async login(@Request() req) {
-    return req.user;
+    return this.authService.login(req.user);
   }
 
   // add account
@@ -43,7 +46,7 @@ export class AdministratorController {
   // get all Administrator
 
   @Get()
-  async getAllAdmin() {
+  async getAllAdmin():Promise<FindAdminsResponesDto[]> {
     const Admins = await this.administratorService.getAdministrators();
     return Admins;
   }
@@ -51,7 +54,7 @@ export class AdministratorController {
   //Get one administrator
 
   @Get(':id')
- async getAdmin(@Param('id') adminId: string) {
+  async getAdmin(@Param('id') adminId: string):Promise<FindAdminsResponesDto> {
     return await this.administratorService.getSingleAdministrator(adminId);
   }
 

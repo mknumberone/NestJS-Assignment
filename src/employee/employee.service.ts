@@ -13,26 +13,26 @@ export class EmployeeService {
   // Create new employee
   async createEmployee(
     employeename: string,
-    photo: string,
+    file: string,
     jobtitle: string,
     cellphone: number,
     email: string,
     department: string,
   ) {
     try {
-      let file = '';
+      // let file = '';
       const newEmployee = new this.employeesModel({
         employeename,
-        photo,
+        photo: file,
         jobtitle,
         cellphone,
         email,
         department,
       });
-      newEmployee.photo = file;
+      // newEmployee.photo = file;
       // Save to database
       const result = await newEmployee.save();
-      return result.name;
+      return result;
     } catch (error) {
       console.log(error);
       throw new NotFoundException('Insert Failed!');

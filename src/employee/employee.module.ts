@@ -11,9 +11,6 @@ import { DepartmentModule } from 'src/department/department.module';
     MongooseModule.forFeature([{ name: 'Employee', schema: EmployeeSchema }]),
   ],
   controllers: [EmployeeController],
-  providers: [EmployeeService],
-  exports: [
-    MongooseModule.forFeature([{ name: 'Employee', schema: EmployeeSchema }]),
-  ],
+  providers: [EmployeeService]
 })
 export class EmployeeModule {}
