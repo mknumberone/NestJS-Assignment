@@ -1,10 +1,12 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class FindEmployeeDto {
-  employeename:string;
-  photo:string;
-  jobtitle:string;
-  cellphone:number;
-  email:string;
-  department:string;
+  employeename: string;
+  photo: string;
+  jobtitle: string;
+  cellphone: number;
+  email: string;
+  department: string;
 }
 
 export class ResponeEmployeeDto {
@@ -17,16 +19,26 @@ export class ResponeEmployeeDto {
 }
 
 export class CreateEmployeeDto {
+  @ApiProperty()
   employeename: string;
+  @ApiProperty()
   photo: string;
+
+  @ApiProperty()
   jobtitle: string;
+
+  @ApiProperty()
   cellphone: number;
+
+  @ApiProperty()
   email: string;
+  
+  @ApiProperty()
   department: string;
-  msg:string;
+  msg: string;
 }
 
-export class UpdateEmployeeDto {  
+export class UpdateEmployeeDto {
   employeename: string;
   photo: string;
   jobtitle: string;

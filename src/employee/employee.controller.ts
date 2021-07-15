@@ -18,6 +18,8 @@ import {
   FindEmployeeDto,
   UpdateEmployeeDto,
 } from './dto/employee.dto';
+import { ApiBadRequestResponse, ApiConsumes, ApiForbiddenResponse, ApiOkResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiFile } from '../ultis/apifile';
 
 @Controller('employee')
 export class EmployeeController {
@@ -25,6 +27,13 @@ export class EmployeeController {
   // Add Employee
   //Upload Photo
   @Post()
+  @ApiFile()
+  @ApiOkResponse({ description: 'OK' })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @UseInterceptors(FileInterceptor('photo', multerOptions))
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('photo', multerOptions))
   async uploadedEmployee(
     @Body('') body: CreateEmployeeDto,
@@ -36,6 +45,11 @@ export class EmployeeController {
   }
   //Update Employee Infor
   @Put(':id')
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse({ description: 'OK' })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'Forbidden' })
   @UseInterceptors(FileInterceptor('photo', multerOptions))
   async updateEm(
     @Param('id') empId: string,
