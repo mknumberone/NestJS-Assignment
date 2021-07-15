@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { CreateAdminDto } from 'src/administrator/dto/administrator.dto';
 import { Department } from './department.model';
+import { CreateDepartmentDto, DepartmentUpdateDto, FindDepartmentDto } from './dto/department.dto';
 
 @Injectable()
 export class DepartmentService {
@@ -12,19 +14,19 @@ export class DepartmentService {
 
   // Create new Department
   async createDepartment(
-    id: string,
-    namedepartment: string,
-    officephone: number,
-    manager: string,
-  ) {
+    payload: CreateDepartmentDto,
+    // id: string,
+    // namedepartment: string,
+    // officephone: number,
+    // manager: string,
+  ): Promise<any> {
     try {
       const newDepartment = new this.departmentModel({
-        id,
-        namedepartment,
-        officephone,
-        manager,
+        namedepartment: payload.namedepartment,
+        officephone: payload.officephone,
+        manager: payload.manager,
       });
-      if (id === newDepartment.id) {
+      if (payload.namedepartment === newDepartment.namedepartment) {
         return 'Phòng này đã tồn tại!';
       }
       //Save to database
@@ -36,29 +38,23 @@ export class DepartmentService {
     }
   }
   // Get all department
-  async getAllDepartment() {
+  async getAllDepartment(): Promise<FindDepartmentDto[]> {
     try {
-      const departments = await this.departmentModel.find().exec();
-      return departments.map((department) => ({
-        id: department.id,
-        namedepartment: department.namedepartment,
-        officephone: department.officephone,
-        manager: department.manager,
-      }));
+      const departments = await this.departmentModel.find();
+      return departments;
     } catch (error) {
       console.log(error);
       throw new NotFoundException('Get Failed!');
     }
   }
   // Get department by id
-  async getOneDepartment(id: string) {
+  async getOneDepartment(id: string): Promise<FindDepartmentDto> {
     try {
       const department = await this.findDepartment(id);
       if (!department) {
-        return 'Not found Department';
+        return undefined;
       } else {
         return {
-          id: department.id,
           namedepartment: department.namedepartment,
           officephone: department.officephone,
           manager: department.manager,
@@ -72,20 +68,21 @@ export class DepartmentService {
   // Update Department Infor
   async updateDepartmentInfor(
     id: string,
-    namedepartment: string,
-    officephone: number,
-    manager: string,
-  ) {
+    payload: DepartmentUpdateDto,
+    // namedepartment: string,
+    // officephone: number,
+    // manager: string,
+  ):Promise<any> {
     try {
       const updateD = await this.findDepartment(id);
-      if (namedepartment) {
-        updateD.namedepartment = namedepartment;
+      if (payload.namedepartment) {
+        updateD.namedepartment = payload.namedepartment;
       }
-      if (officephone) {
-        updateD.officephone = officephone;
+      if (payload.officephone) {
+        updateD.officephone = payload.officephone;
       }
-      if (manager) {
-        updateD.manager = manager;
+      if (payload.manager) {
+        updateD.manager = payload.manager;
       }
       updateD.save();
     } catch (error) {

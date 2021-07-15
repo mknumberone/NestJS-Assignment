@@ -13,6 +13,11 @@ import { Get } from '@nestjs/common';
 import { Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../ultis/file-uploading.utils';
+import {
+  CreateEmployeeDto,
+  FindEmployeeDto,
+  UpdateEmployeeDto,
+} from './dto/employee.dto';
 
 @Controller('employee')
 export class EmployeeController {
@@ -22,22 +27,11 @@ export class EmployeeController {
   @Post()
   @UseInterceptors(FileInterceptor('photo', multerOptions))
   async uploadedEmployee(
-    @Body('name') employeename: string,
+    @Body('') body: CreateEmployeeDto,
     @UploadedFile() file: Express.Multer.File,
-    // @Body('photo') photo: string,
-    @Body('jobtitle') jobtitle: string,
-    @Body('cellphone') cellphone: number,
-    @Body('email') email: string,
-    @Body('department') department: string,
-  ) {
-    const result = await this.employeesService.createEmployee(
-      employeename,
-      file.path,
-      jobtitle,
-      cellphone,
-      email,
-      department,
-    );
+  ): Promise<any> {
+    body.photo = file.path;
+    const result = await this.employeesService.createEmployee(body);
     return result;
   }
   //Update Employee Infor
@@ -45,35 +39,23 @@ export class EmployeeController {
   @UseInterceptors(FileInterceptor('photo', multerOptions))
   async updateEm(
     @Param('id') empId: string,
-    @Body('name') employeename: string,
-    @Body('photo') photo: string,
-    @Body('jobtitle') jobtitle: string,
-    @Body('cellphone') cellphone: number,
-    @Body('email') email: string,
-    @Body('department') department: string,
+    @Body('') body: UpdateEmployeeDto,
     @UploadedFile() file: Express.Multer.File,
-  ) {
-    const result = await this.employeesService.updateEmployeeInfor(
-      empId,
-      employeename,
-      (photo = file.path),
-      jobtitle,
-      cellphone,
-      email,
-      department,
-    );
+  ): Promise<any> {
+    body.photo = file.path;
+    const result = await this.employeesService.updateEmployeeInfor(body, empId);
     return result + 'Everything has been updated';
   }
   // Get List Employee
   @Get()
-  async getAllEmp() {
+  async getAllEmp(): Promise<FindEmployeeDto[]> {
     const employee = await this.employeesService.getAllEmployees();
     return employee;
   }
 
   // Get by id
   @Get(':id')
-  async getOneEmp(@Param('id') EmpId: string) {
+  async getOneEmp(@Param('id') EmpId: string): Promise<FindEmployeeDto> {
     return await this.employeesService.getEmployee(EmpId);
   }
 

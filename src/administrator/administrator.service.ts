@@ -6,57 +6,49 @@ import { sendMail } from '../ultis/mailer';
 const bcrypt = require('bcrypt');
 
 import { v4 as uuidv4 } from 'uuid';
-import { CreateAdminDto, FindAdminsResponesDto } from './dto/administrator.dto';
+import {
+  CreateAdminDto,
+  FindAdminsResponesDto,
+  UpdateAdminRespone,
+} from './dto/administrator.dto';
 
 @Injectable()
 export class AdministratorService {
   constructor(
     @InjectModel('Administrator')
     private readonly administratorModel: Model<Administrator>,
-  ) {}
+  ) { }
   // insert a account to database
-  async insertAccount(
-    payload:CreateAdminDto,
-    username: string,
-    //password: string,
-    email: string,
-    role: string,
-    state: boolean,
-  ) {
+  async insertAccount(payload: CreateAdminDto,): Promise<any> {
     try {
-      const user = await this.findUserName(username);
-      if (user.length != 0) {
-        return 'Người dùng đã tồn tại';
-      } else {
-        // Password Encryption
-        const saltOrRounds = 10;
-        let passwordPlainText = uuidv4();
-        const password = await bcrypt.hash(passwordPlainText, saltOrRounds);
-        const newAdministrator = new this.administratorModel({
-          username,
-          password,
-          email,
-          role,
-          state,
-        });
-        // Save admin in DB
-        const result = await newAdministrator.save();
-        // Send email to user new
-        await sendMail(
-          email,
-          '[NWS] NewWave Solution Thông tin đăng nhập',
-          `
-        <strong>Username : ${username} </strong>
-        <br/>
-       <strong> Password : ${passwordPlainText}</strong>
-       <p>Vui lòng đổi mật khẩu khi đăng nhập thành công!</p>
-      `,
-        );
-        return {
-          id: result.id as string,
-          password: passwordPlainText as string,
-        };
-      }
+      let newAdmin = {...payload};
+      const user = await this.administratorModel.find({ username: payload.username }).exec();
+      //Check username 
+      if (user.length) return { msg: 'User already exists' };
+      // hash password
+      const saltOrRounds = 10;
+      let passwordPlainText = uuidv4();
+      const passwordhash = await bcrypt.hash(passwordPlainText, saltOrRounds);
+      // send to mail
+      await sendMail(
+        newAdmin.email,
+        '[NWS] NewWave Solution Thông tin đăng nhập',
+        `
+          <strong>Username : ${newAdmin.username} </strong>
+          <br/>
+         <strong> Password : ${passwordPlainText}</strong>
+         <p>Vui lòng đổi mật khẩu khi đăng nhập thành công!</p>
+        `,
+      );
+      const newAdministrator = new this.administratorModel({
+        username: payload.username,
+        password: passwordhash,
+        email: payload.email,
+        role: payload.role,
+        state: payload.state,
+      });
+      //save to db
+      return await newAdministrator.save();
     } catch (error) {
       throw new NotFoundException('Insert Failed!');
     }
@@ -65,47 +57,53 @@ export class AdministratorService {
   async getAdministrators(): Promise<FindAdminsResponesDto[]> {
     try {
       const administrators = await this.administratorModel.find();
-      return administrators
+      return administrators;
     } catch (error) {
       throw new NotFoundException('Get Failed!');
     }
   }
   // Get admin by Id
-  async getSingleAdministrator(adminId: string):Promise<FindAdminsResponesDto>{
+  async getSingleAdministrator(
+    adminId: string,
+  ): Promise<FindAdminsResponesDto> {
     try {
       const admin = await this.findAdmin(adminId);
-      return admin
+      return admin;
     } catch (error) {
       throw new NotFoundException('Delete Failed!');
     }
   }
   // Update admin
   async updateAdmin(
+    payload: UpdateAdminRespone,
     adminId: string,
-    username: string,
-    password: string,
-    email: string,
-    role: string,
-    state: boolean,
-  ) {
+  ): Promise<any> {
     try {
       const updatedAdmin = await this.findAdmin(adminId);
-      if (username) {
-        updatedAdmin.username = username;
+      let newUpdate = {
+        ...payload,
       }
-      if (password) {
-        updatedAdmin.password = password;
+
+      if (newUpdate.username) {
+        updatedAdmin.username = newUpdate.username
       }
-      if (email) {
-        updatedAdmin.email = email;
+
+      if (newUpdate.email) {
+        updatedAdmin.email = newUpdate.email;
       }
-      if (role) {
-        updatedAdmin.role = role;
+
+      // if (newUpdate.password) {
+      //   updatedAdmin.password = newUpdate.password;
+      // }
+
+      if (newUpdate.role) {
+        updatedAdmin.role = newUpdate.role;
       }
-      if (state) {
-        updatedAdmin.state = state;
+      if (newUpdate.state) {
+        updatedAdmin.state = newUpdate.state;
       }
-      updatedAdmin.save();
+      updatedAdmin.save()
+
     } catch (error) {
       throw new NotFoundException('Update Failed!');
     }
@@ -138,7 +136,7 @@ export class AdministratorService {
       const checkNewAndOldPass = oldPass !== newPass;
       switch (true) {
         case !userRow:
-          return 'Người dùng đéo tồn tại';
+          return 'Người dùng khôbg tồn tại';
         case userRow:
           if (!match) {
             return 'Mật khẩu cũ chưa đúng';

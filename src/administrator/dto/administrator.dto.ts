@@ -10,20 +10,23 @@ export class FindAdminsResponesDto {
 export class CreateAdminDto {
     username: string;
     email: string;
+    password:string;
     role: string;
     state: boolean;
+    msg:string;
 }
 
 export class AdminResponeDto {
     username: string;
-    email: string;
+    password:string;
     role: string;
+    email: string;
     state: boolean;
 }
 
 export class UpdateAdminRespone {
     username: string;
-    password: string;
+    // password: string;
     email: string;
     role: string;
     state: boolean;

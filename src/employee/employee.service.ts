@@ -2,34 +2,30 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Employee } from './employee.model';
+import { CreateEmployeeDto, FindEmployeeDto, UpdateEmployeeDto } from './dto/employee.dto';
 
 @Injectable()
 export class EmployeeService {
   constructor(
-    @InjectModel('Employee')
-    private readonly employeesModel: Model<Employee>,
+    @InjectModel('Employee') private readonly employeesModel: Model<Employee>,
   ) {}
 
   // Create new employee
-  async createEmployee(
-    employeename: string,
-    file: string,
-    jobtitle: string,
-    cellphone: number,
-    email: string,
-    department: string,
-  ) {
+  async createEmployee(payload: CreateEmployeeDto): Promise<any> {
     try {
-      // let file = '';
-      const newEmployee = new this.employeesModel({
-        employeename,
-        photo: file,
-        jobtitle,
-        cellphone,
-        email,
-        department,
+      let employees = { ...payload };
+      const employee = await this.employeesModel.find({
+        employeename: employees.employeename,
       });
-      // newEmployee.photo = file;
+      if (!employee) return { msg: 'Đã tồn tại' };
+      const newEmployee = await new this.employeesModel({
+        employeename: employees.employeename,
+        photo: employees.photo,
+        jobtitle: employees.jobtitle,
+        cellphone: employees.cellphone,
+        email: employees.email,
+        department: employees.department,
+      });
       // Save to database
       const result = await newEmployee.save();
       return result;
@@ -40,36 +36,23 @@ export class EmployeeService {
   }
   // Update Employee Infor
   async updateEmployeeInfor(
+    payload: UpdateEmployeeDto,
     employeeId: string,
-    employeename: string,
-    photo: string,
-    jobtitle: string,
-    cellphone: number,
-    email: string,
-    department: string,
-  ) {
+    // employeename: string,
+    // photo: string,
+    // jobtitle: string,
+    // cellphone: number,
+    // email: string,
+    // department: string,
+  ):Promise<any> {
     try {
-      let file = '';
       const updateEm = await this.findEmId(employeeId);
-      if (employeename) {
-        updateEm.name = employeename;
-      }
-      if (photo) {
-        updateEm.photo = photo = file;
-      }
-      if (jobtitle) {
-        updateEm.jobtitle = jobtitle;
-      }
-      if (cellphone) {
-        updateEm.cellphone = cellphone;
-      }
-      if (email) {
-        updateEm.email = email;
-      }
-      if (department) {
-        updateEm.department = department;
-      }
-
+      if(payload.employeename) {updateEm.employeename = payload.employeename;}
+      if(payload.photo) {updateEm.employeename = payload.photo;}
+      if(payload.jobtitle) {updateEm.jobtitle = payload.jobtitle;}      // let file = '';
+      if(payload.cellphone) {updateEm.cellphone = payload.cellphone;} 
+      if (payload.email) {updateEm.email = payload.email;} 
+      if(payload.department){updateEm.department = payload.department;}
       updateEm.save();
     } catch (error) {
       console.log(error);
@@ -77,40 +60,23 @@ export class EmployeeService {
     }
   }
   // Get all list employee
-  async getAllEmployees() {
+  async getAllEmployees(): Promise<FindEmployeeDto[]> {
     try {
-      const employees = await this.employeesModel.find().exec();
-      return employees.map((employee) => ({
-        id: employee.id,
-        name: employee.name,
-        photo: employee.photo,
-        jobtitle: employee.jobtitle,
-        cellphone: employee.cellphone,
-        email: employee.email,
-        department: employee.department,
-      }));
+      const employees = await this.employeesModel.find();
+      return employees;
     } catch (error) {
       console.log(error);
       throw new NotFoundException('Get Failed!');
     }
   }
   // Get Employee by id
-  async getEmployee(employeeId: string) {
+  async getEmployee(employeeId: string): Promise<FindEmployeeDto> {
     try {
       const employee = await this.findEmId(employeeId);
       if (!employee) {
-        return 'Not found Employee';
-      } else {
-        return {
-          id: employee.id,
-          name: employee.name,
-          photo: employee.photo,
-          jobtitle: employee.jobtitle,
-          cellphone: employee.cellphone,
-          email: employee.email,
-          department: employee.department,
-        };
+        return null;
       }
+      return employee;
     } catch (error) {
       console.log(error);
       throw new NotFoundException('Get Failed!');
