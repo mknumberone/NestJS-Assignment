@@ -6,6 +6,7 @@ import {
   Post,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { Body } from '@nestjs/common';
@@ -18,8 +19,13 @@ import {
   FindEmployeeDto,
   UpdateEmployeeDto,
 } from './dto/employee.dto';
-import { ApiBadRequestResponse, ApiConsumes, ApiForbiddenResponse, ApiOkResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiConsumes, ApiForbiddenResponse, ApiOkResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ApiFile } from '../ultis/apifile';
+import { RolesGuard } from 'src/role/roles.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import path from 'path'
+console.log(path);
+
 
 @Controller('employee')
 export class EmployeeController {
@@ -27,13 +33,14 @@ export class EmployeeController {
   // Add Employee
   //Upload Photo
   @Post()
-  @ApiFile()
-  @ApiOkResponse({ description: 'OK' })
-  @ApiBadRequestResponse({ description: 'Bad Request' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Forbidden' })
-  @UseInterceptors(FileInterceptor('photo', multerOptions))
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
+  @ApiFile()
+  @ApiOkResponse({ description: "OK" })
+  @ApiBadRequestResponse({ description: "Bad Request" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
+  @ApiForbiddenResponse({ description: "Forbidden" })
   @UseInterceptors(FileInterceptor('photo', multerOptions))
   async uploadedEmployee(
     @Body('') body: CreateEmployeeDto,
@@ -45,6 +52,7 @@ export class EmployeeController {
   }
   //Update Employee Infor
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiConsumes('multipart/form-data')
   @ApiOkResponse({ description: 'OK' })
   @ApiBadRequestResponse({ description: 'Bad Request' })
@@ -53,7 +61,7 @@ export class EmployeeController {
   @UseInterceptors(FileInterceptor('photo', multerOptions))
   async updateEm(
     @Param('id') empId: string,
-    @Body('') body: UpdateEmployeeDto,
+    @Body() body: UpdateEmployeeDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
     body.photo = file.path;
@@ -62,27 +70,39 @@ export class EmployeeController {
   }
   // Get List Employee
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: "OK" })
+  @ApiBadRequestResponse({ description: "Bad Request" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
   async getAllEmp(): Promise<FindEmployeeDto[]> {
+    
     const employee = await this.employeesService.getAllEmployees();
     return employee;
   }
 
   // Get by id
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: "OK" })
+  @ApiBadRequestResponse({ description: "Bad Request" })
+  @ApiUnauthorizedResponse({ description: "Unauthorized" })
   async getOneEmp(@Param('id') EmpId: string): Promise<FindEmployeeDto> {
     return await this.employeesService.getEmployee(EmpId);
   }
 
   // Delete Employee Infor
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse({ description: 'OK' })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'Forbidden' })
   async removeEmp(@Param('id') empId: string) {
     await this.employeesService.deleteEmloyeeInfor(empId);
     return null;
   }
 
-  // Get image
-  @Get(':imgpath')
-  seeUploadedFile(@Param('imgpath') image, @Res() res) {
-    return res.sendFile(image, { root: './files' });
-  }
 }

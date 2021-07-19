@@ -17,7 +17,7 @@ export class EmployeeService {
       const employee = await this.employeesModel.find({
         employeename: employees.employeename,
       });
-      if (!employee) return { msg: 'Đã tồn tại' };
+      if (employee.length != 0) return { msg: 'Đã tồn tại' };
       const newEmployee = await new this.employeesModel({
         employeename: employees.employeename,
         photo: employees.photo,
@@ -38,18 +38,12 @@ export class EmployeeService {
   async updateEmployeeInfor(
     payload: UpdateEmployeeDto,
     employeeId: string,
-    // employeename: string,
-    // photo: string,
-    // jobtitle: string,
-    // cellphone: number,
-    // email: string,
-    // department: string,
   ):Promise<any> {
     try {
       const updateEm = await this.findEmId(employeeId);
       if(payload.employeename) {updateEm.employeename = payload.employeename;}
       if(payload.photo) {updateEm.employeename = payload.photo;}
-      if(payload.jobtitle) {updateEm.jobtitle = payload.jobtitle;}      // let file = '';
+      if(payload.jobtitle) {updateEm.jobtitle = payload.jobtitle;}     
       if(payload.cellphone) {updateEm.cellphone = payload.cellphone;} 
       if (payload.email) {updateEm.email = payload.email;} 
       if(payload.department){updateEm.department = payload.department;}
@@ -103,8 +97,6 @@ export class EmployeeService {
     const employees = await this.employeesModel.find({
       department: departmentId.id,
     });
-    //  employees.filter((employee) => return employee.department == departmentId.id;
-    // const department = this.departmentModel.find({ _id: departmentId.id });
     return employees;
   }
   //Find by Emloyee by ID

@@ -1,33 +1,79 @@
+import { ApiProperty } from "@nestjs/swagger";
 
 export class FindAdminsResponesDto {
+    @ApiProperty()
     username: string;
+
+    @ApiProperty()
     password: string;
+
+    @ApiProperty()
     email: string;
-    role: string;
+
+    @ApiProperty()
+    role: number;
+
+    @ApiProperty()
     state: boolean;
 }
 
 export class CreateAdminDto {
+    @ApiProperty()
     username: string;
+
+    @ApiProperty()
+    password: string;
+
+    @ApiProperty()
     email: string;
-    password:string;
-    role: string;
+
+    @ApiProperty()
+    role: number;
+
+    @ApiProperty()
     state: boolean;
-    msg:string;
+    @ApiProperty()
+    msg: string;
 }
 
 export class AdminResponeDto {
+    @ApiProperty()
     username: string;
-    password:string;
-    role: string;
+
+    @ApiProperty()
+    password: string;
+
+    @ApiProperty()
     email: string;
+
+    @ApiProperty()
+    role: number;
+
+    @ApiProperty()
     state: boolean;
 }
 
 export class UpdateAdminRespone {
+    @ApiProperty()
     username: string;
+
+    // @ApiProperty()
     // password: string;
+
+    @ApiProperty()
     email: string;
-    role: string;
+
+    @ApiProperty()
+    role: number;
+
+    @ApiProperty()
     state: boolean;
+}
+
+export class loginDTO {
+    @ApiProperty()
+    username: string;
+
+    @ApiProperty()
+    password: string;
 }

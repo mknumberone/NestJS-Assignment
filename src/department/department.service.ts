@@ -10,26 +10,25 @@ export class DepartmentService {
   constructor(
     @InjectModel('Department')
     private readonly departmentModel: Model<Department>,
-  ) {}
+  ) { }
 
   // Create new Department
   async createDepartment(
     payload: CreateDepartmentDto,
-    // id: string,
-    // namedepartment: string,
-    // officephone: number,
-    // manager: string,
   ): Promise<any> {
     try {
-      const newDepartment = new this.departmentModel({
-        namedepartment: payload.namedepartment,
-        officephone: payload.officephone,
-        manager: payload.manager,
-      });
-      if (payload.namedepartment === newDepartment.namedepartment) {
-        return 'Phòng này đã tồn tại!';
-      }
-      //Save to database
+    //Ve nha check
+    let department = {...payload}
+    const departments = await this.departmentModel.find({
+      namedepartment:department.namedepartment,
+    })
+    if(departments.length != 0) return { msg:"Phòng đã tồn tại!"}
+    const newDepartment = new this.departmentModel({
+      namedepartment: payload.namedepartment,
+      officephone: payload.officephone,
+      manager: payload.manager,
+    });
+    //Save to database
       const result = await newDepartment.save();
       return result;
     } catch (error) {
@@ -69,10 +68,7 @@ export class DepartmentService {
   async updateDepartmentInfor(
     id: string,
     payload: DepartmentUpdateDto,
-    // namedepartment: string,
-    // officephone: number,
-    // manager: string,
-  ):Promise<any> {
+  ): Promise<any> {
     try {
       const updateD = await this.findDepartment(id);
       if (payload.namedepartment) {
@@ -99,9 +95,9 @@ export class DepartmentService {
       if (result.n === 0) {
         throw new NotFoundException('Could not find Department');
       }
-    } catch (error) {}
+    } catch (error) { }
   }
-
+ // fiind Department by ma
   // find Department by id
   async findDepartment(id: string): Promise<Department> {
     let department;

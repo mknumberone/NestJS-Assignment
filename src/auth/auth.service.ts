@@ -22,16 +22,18 @@ export class AuthService {
   }
 
   async login(user: any) {
+    console.log(user);
+    
     const payload = {
       username: user.username,
-      password: user.password
+      password: user.password,
+      role:user.role,
     };
+    console.log(payload,'payload')
     return {
       accessToken: this.jwtService.sign(payload, { expiresIn: 60 * 60 }),
       expiresIn: 60 * 60,
     };
   }
-  async logOut(user:any){
-    
-  }
+
 }

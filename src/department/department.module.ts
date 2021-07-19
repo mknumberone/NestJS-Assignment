@@ -5,7 +5,7 @@ import { EmployeeService } from '../employee/employee.service';
 import { DepartmentController } from './department.controller';
 import { DepartmentSchema } from './department.model';
 import { DepartmentService } from './department.service';
-import { EmpDepartmentController } from './employee.controller';
+
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { EmpDepartmentController } from './employee.controller';
       { name: 'Employee', schema: EmployeeSchema },
     ]),
   ],
-  controllers: [DepartmentController, EmpDepartmentController],
+  controllers: [DepartmentController],
   providers: [DepartmentService, EmployeeService],
 })
 export class DepartmentModule {}
