@@ -3,28 +3,37 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Administrator } from './administrator.model';
 import { sendMail } from '../ultis/mailer';
-const bcrypt = require('bcrypt');
-
 import { v4 as uuidv4 } from 'uuid';
 import {
   CreateAdminDto,
   FindAdminsResponesDto,
   UpdateAdminRespone,
 } from './dto/administrator.dto';
+import {
+  paginate,
+  Pagination,
+  IPaginationOptions,
+  IPaginationMeta,
+} from 'nestjs-typeorm-paginate';
 
+const bcrypt = require('bcrypt');
 @Injectable()
 export class AdministratorService {
   constructor(
     @InjectModel('Administrator')
     private readonly administratorModel: Model<Administrator>,
   ) { }
+
+  //Pagination
+
   // insert a account to database
   async insertAccount(payload: CreateAdminDto,): Promise<any> {
     try {
       let newAdmin = {...payload};
       const user = await this.administratorModel.find({ username: payload.username }).exec();
       //Check username 
-      if (user.length) return { msg: 'User already exists' };
+      if (user.length !=0) return { msg: 'User already exists', statusCode:400};
+      // if (newAdmin) return { msg: 'Success', statusCode: 200 };
       // hash password
       const saltOrRounds = 10;
       let passwordPlainText = uuidv4();
@@ -36,8 +45,8 @@ export class AdministratorService {
         `
           <strong>Username : ${newAdmin.username} </strong>
           <br/>
-         <strong> Password : ${passwordPlainText}</strong>
-         <p>Vui lòng đổi mật khẩu khi đăng nhập thành công!</p>
+        <strong> Password : ${passwordPlainText}</strong>
+        <p>Vui lòng đổi mật khẩu khi đăng nhập thành công!</p>
         `,
       );
       const newAdministrator = new this.administratorModel({
@@ -48,7 +57,7 @@ export class AdministratorService {
         state: payload.state,
       });
       //save to db
-      return await newAdministrator.save();
+      return newAdministrator.save();
     } catch (error) {
       throw new NotFoundException('Insert Failed!');
     }
@@ -91,10 +100,6 @@ export class AdministratorService {
       if (newUpdate.email) {
         updatedAdmin.email = newUpdate.email;
       }
-
-      // if (newUpdate.password) {
-      //   updatedAdmin.password = newUpdate.password;
-      // }
 
       if (newUpdate.role) {
         updatedAdmin.role = newUpdate.role;
@@ -186,5 +191,13 @@ export class AdministratorService {
       throw new NotFoundException('Could not find administrator.');
     }
     return administrator;
+  }
+
+  find(options) {
+    return this.administratorModel.find(options);
+  }
+
+  count(options) {
+    return this.administratorModel.count(options).exec();
   }
 }

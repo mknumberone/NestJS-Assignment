@@ -8,14 +8,15 @@ import {
   Delete,
   Request,
   UseGuards,
+  Query
 } from '@nestjs/common';
-import {AdministratorService} from './administrator.service'
+import { AdministratorService } from './administrator.service'
 import { AuthGuard } from '@nestjs/passport';
 import { Put } from '@nestjs/common';
 import { AdminResponeDto, CreateAdminDto, FindAdminsResponesDto, loginDTO, UpdateAdminRespone } from './dto/administrator.dto';
 import { AuthService } from '../auth/auth.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiParam, ApiQuery, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { RolesGuard } from '../role/roles.guard';
 
 @Controller('administrators')
@@ -23,7 +24,41 @@ export class AdministratorController {
   constructor(
     private readonly administratorService: AdministratorService,
     private readonly authService: AuthService,
-  ) {}
+  ) { }
+
+  // Pagination
+  @ApiQuery({name:'page'})
+  @Get('paginate')
+  async pagination(@Query('page') page: number = 1) {
+    let options = {};
+    // if (req.query.s) {
+    //   options = {
+    //     $or: [
+    //       { title: new RegExp(req.query.s.toString(), 'i') },
+    //       { description: new RegExp(req.query.s.toString(), 'i') },
+    //     ]
+    //   }
+    // }
+
+    const query = this.administratorService.find(options);
+    // if (req.query.sort) {
+    //   query.sort({
+    //     price: req.query.sort
+    //   })
+    // }
+    const currentPage: number = parseInt(page as any) || 1;
+    const limit = 9;
+    const total = await this.administratorService.count(options);
+    const data = await query.skip((currentPage - 1) * limit).limit(limit).exec();
+
+    return {
+      data,
+      total,
+      page,
+      last_page: Math.ceil(total / limit)
+    };
+  }
+
   // Login
   @UseGuards(AuthGuard('local'))
   @ApiBearerAuth()
@@ -36,7 +71,7 @@ export class AdministratorController {
 
   // add account
   @Post()
-  @UseGuards(JwtAuthGuard,RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiBody({ type: AdminResponeDto })
   @ApiOkResponse({ description: "OK" })
@@ -47,7 +82,7 @@ export class AdministratorController {
     return result;
   }
   // get all Administrator
-  
+
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -79,9 +114,9 @@ export class AdministratorController {
   @ApiOkResponse({ description: "OK" })
   @ApiBadRequestResponse({ description: "Bad Request" })
   @ApiUnauthorizedResponse({ description: "Unauthorized" })
-  async updateAdmin(@Param('id') adminId: string,@Body() body: UpdateAdminRespone,
-):Promise<any> {
-    await this.administratorService.updateAdmin(body,adminId);
+  async updateAdmin(@Param('id') adminId: string, @Body() body: UpdateAdminRespone,
+  ): Promise<any> {
+    await this.administratorService.updateAdmin(body, adminId);
     return null;
   }
   // Delete account

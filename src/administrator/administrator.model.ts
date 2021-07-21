@@ -9,7 +9,6 @@ export const AdministratorSchema = new mongoose.Schema({
 })
 
 export interface Administrator {
-    length: number;
     save()
     id: string;
     username: string;

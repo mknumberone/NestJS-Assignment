@@ -22,9 +22,6 @@ export class CreateAdminDto {
     username: string;
 
     @ApiProperty()
-    password: string;
-
-    @ApiProperty()
     email: string;
 
     @ApiProperty()
@@ -39,9 +36,6 @@ export class CreateAdminDto {
 export class AdminResponeDto {
     @ApiProperty()
     username: string;
-
-    @ApiProperty()
-    password: string;
 
     @ApiProperty()
     email: string;
@@ -77,3 +71,4 @@ export class loginDTO {
     @ApiProperty()
     password: string;
 }
+

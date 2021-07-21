@@ -104,5 +104,13 @@ export class EmployeeController {
     await this.employeesService.deleteEmloyeeInfor(empId);
     return null;
   }
+  //Get images Employee
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('uploads/:photo')
+  serverImage(@Param('photo') photo, @Res() res): Promise<any> {
+    return res.sendFile(photo, { root: 'uploads' })
+  }
+
 
 }
