@@ -31,27 +31,14 @@ export class AdministratorController {
   @Get('paginate')
   async pagination(@Query('page') page: number = 1) {
     let options = {};
-    // if (req.query.s) {
-    //   options = {
-    //     $or: [
-    //       { title: new RegExp(req.query.s.toString(), 'i') },
-    //       { description: new RegExp(req.query.s.toString(), 'i') },
-    //     ]
-    //   }
-    // }
-
     const query = this.administratorService.find(options);
-    // if (req.query.sort) {
-    //   query.sort({
-    //     price: req.query.sort
-    //   })
-    // }
     const currentPage: number = parseInt(page as any) || 1;
     const limit = 9;
     const total = await this.administratorService.count(options);
     const data = await query.skip((currentPage - 1) * limit).limit(limit).exec();
 
     return {
+      success:"Success",
       data,
       total,
       page,

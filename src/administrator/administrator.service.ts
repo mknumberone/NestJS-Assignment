@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Administrator } from './administrator.model';
@@ -9,12 +9,6 @@ import {
   FindAdminsResponesDto,
   UpdateAdminRespone,
 } from './dto/administrator.dto';
-import {
-  paginate,
-  Pagination,
-  IPaginationOptions,
-  IPaginationMeta,
-} from 'nestjs-typeorm-paginate';
 
 const bcrypt = require('bcrypt');
 @Injectable()
@@ -32,7 +26,7 @@ export class AdministratorService {
       let newAdmin = {...payload};
       const user = await this.administratorModel.find({ username: payload.username }).exec();
       //Check username 
-      if (user.length !=0) return { msg: 'User already exists', statusCode:400};
+      if (user.length != 0) throw new Error('User already exists');
       // if (newAdmin) return { msg: 'Success', statusCode: 200 };
       // hash password
       const saltOrRounds = 10;
@@ -59,7 +53,7 @@ export class AdministratorService {
       //save to db
       return newAdministrator.save();
     } catch (error) {
-      throw new NotFoundException('Insert Failed!');
+      throw new NotFoundException( error.message || 'Insert Failed!');
     }
   }
   //Get all list admin
